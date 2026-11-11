@@ -1,5 +1,5 @@
 from itertools import combinations
-from typing import Optional, Sequence, Union
+from typing import Hashable, Mapping, Optional, Sequence, TypeVar, Union
 
 from power_grid.simple_types import (
     PowerPlant, PowerPlantNumber, RequestError, Resource)
@@ -7,9 +7,40 @@ from power_grid.simple_types import (
 MAX_POWER_PLANTS = 3
 STORAGE_FACTOR = 2  # a plant can store up to 2x the resources it needs per run
 
+Key = TypeVar("Key", bound=Hashable)
+
+
+def _demands_can_be_met(demands: Sequence[tuple[int, frozenset[Key]]],
+                        supply: Mapping[Key, int]) -> bool:
+    """
+    Checks whether every demand can be served from the supply.
+
+    Each demand is (amount, set of keys it may take from). Supply is the capacity
+    per key. The demands can all be met exactly when, for every group of demands,
+    their total amount does not exceed the total supply of all keys they may use
+    (Hall's condition). With at most 3 plants and 4 resources the groups are few.
+    """
+    for size in range(1, len(demands) + 1):
+        for group in combinations(demands, size):
+            needed = sum(amount for amount, _ in group)
+            usable_keys: set[Key] = set()
+            for _, keys in group:
+                usable_keys |= keys
+            if needed > sum(supply.get(key, 0) for key in usable_keys):
+                return False
+    return True
+
+
+def _count(resources: Sequence[Resource]) -> dict[Resource, int]:
+    """Counts how many units of each resource are in the list."""
+    counts: dict[Resource, int] = {resource: 0 for resource in Resource}
+    for resource in resources:
+        counts[resource] += 1
+    return counts
+
 
 class PlayerPowerPlants:
-    """Stores the power plants a player owns (implements UsePowerPlants)."""
+    """Stores the power plants a player owns (at most MAX_POWER_PLANTS)."""
 
     def __init__(self, plants: Sequence[PowerPlant] = ()) -> None:
         self._plants: list[PowerPlant] = []
@@ -29,13 +60,13 @@ class PlayerPowerPlants:
         if not self.can_add_power_plant():
             raise ValueError("Player already owns the maximum number of power plants")
         if any(owned.number == plant.number for owned in self._plants):
-            raise ValueError(f"Power plant {plant.number} is already owned")
+            raise ValueError(f"Power plant {plant.number.number} is already owned")
         self._plants.append(plant)
 
     def remove_power_plant(self, number: PowerPlantNumber) -> Optional[RequestError]:
         """Removes the plant with the given number, or returns an error if not owned."""
         for plant in self._plants:
-            if plant.number == number.number:
+            if plant.number == number:
                 self._plants.remove(plant)
                 return None
         return RequestError(f"Power plant {number.number} is not owned")
@@ -45,29 +76,37 @@ class PlayerPowerPlants:
         return list(self._plants)
 
     def best_power_plant(self) -> Optional[PowerPlantNumber]:
-        """Returns the number of the plant with the highest number (None if no plants)."""
+        """Returns the highest plant number the player owns (None if no plants)."""
         if not self._plants:
             return None
-        return PowerPlantNumber(max(plant.number for plant in self._plants))
+        return max((plant.number for plant in self._plants),
+                   key=lambda number: number.number)
 
     def can_store_resources(self, resources: Sequence[Resource]) -> bool:
-        """Checks whether the given resources fit into the storage of the owned plants."""
-        capacity: dict[Resource, int] = {resource: 0 for resource in Resource}
-        for plant in self._plants:
-            if plant.resource is not None:
-                capacity[plant.resource] += STORAGE_FACTOR * plant.required_resources
-        needed: dict[Resource, int] = {resource: 0 for resource in Resource}
-        for resource in resources:
-            needed[resource] += 1
-        return all(needed[resource] <= capacity[resource] for resource in Resource)
+        """
+        Checks whether the given resources fit into the storage of the owned plants.
+
+        A plant stores up to STORAGE_FACTOR * resourceAmount units, shared between
+        all the resources it accepts (hybrid plants).
+        """
+        capacity = {index: STORAGE_FACTOR * plant.resourceAmount
+                    for index, plant in enumerate(self._plants)}
+        demands: list[tuple[int, frozenset[int]]] = []
+        for resource, amount in _count(resources).items():
+            if amount > 0:
+                accepting = frozenset(
+                    index for index, plant in enumerate(self._plants)
+                    if resource in plant.acceptedResources)
+                demands.append((amount, accepting))
+        return _demands_can_be_met(demands, capacity)
 
     def number_of_connectable_cities(self, resources: Sequence[Resource]) -> int:
         """Returns the maximum number of cities the owned plants can power with the resources."""
         best = 0
         for size in range(len(self._plants) + 1):
             for chosen in combinations(self._plants, size):
-                if self._needs_fit(chosen, resources):
-                    best = max(best, sum(plant.cities for plant in chosen))
+                if self._can_run(chosen, resources):
+                    best = max(best, sum(plant.numberOfCities for plant in chosen))
         return best
 
     def cities_powered_by(self, numbers: Sequence[PowerPlantNumber],
@@ -81,24 +120,19 @@ class PlayerPowerPlants:
         """
         chosen: list[PowerPlant] = []
         for number in numbers:
-            owned = [plant for plant in self._plants if plant.number == number.number]
+            owned = [plant for plant in self._plants if plant.number == number]
             if not owned:
                 return RequestError(f"Power plant {number.number} is not owned")
             if owned[0] in chosen:
                 return RequestError(f"Power plant {number.number} listed twice")
             chosen.append(owned[0])
-        if not self._needs_fit(chosen, resources):
+        if not self._can_run(chosen, resources):
             return RequestError("Not enough resources to run the chosen power plants")
-        return sum(plant.cities for plant in chosen)
+        return sum(plant.numberOfCities for plant in chosen)
 
     @staticmethod
-    def _needs_fit(plants: Sequence[PowerPlant], resources: Sequence[Resource]) -> bool:
-        """Checks whether the available resources cover what the plants need."""
-        needed: dict[Resource, int] = {resource: 0 for resource in Resource}
-        for plant in plants:
-            if plant.resource is not None:
-                needed[plant.resource] += plant.required_resources
-        available: dict[Resource, int] = {resource: 0 for resource in Resource}
-        for resource in resources:
-            available[resource] += 1
-        return all(needed[resource] <= available[resource] for resource in Resource)
+    def _can_run(plants: Sequence[PowerPlant], resources: Sequence[Resource]) -> bool:
+        """Checks whether the resources can fuel all the given plants at the same time."""
+        demands = [(plant.resourceAmount, frozenset(plant.acceptedResources))
+                   for plant in plants if plant.resourceAmount > 0]
+        return _demands_can_be_met(demands, _count(resources))
