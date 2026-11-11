@@ -1,13 +1,13 @@
-from typing import List
+
 from power_grid.simple_types import Resource
 
 
 class ResourcePool:
-    def __init__(self, initial_resources: List[Resource] | None = None) -> None:
+    def __init__(self, initial_resources: list[Resource] | None = None) -> None:
         # Initialize the pool with a list of resources
         self._resources: list[Resource] = initial_resources.copy() if initial_resources else []
 
-    def canTakeResourcesFromStorageSpace(self, resources: List[Resource]) -> bool:
+    def canTakeResourcesFromStorageSpace(self, resources: list[Resource]) -> bool:
         # Check if there are enough resources in the pool to take
         needed: dict[Resource, int] = {}
         for res in resources:
@@ -22,17 +22,17 @@ class ResourcePool:
                 return False
         return True
 
-    def getFromStorageSpace(self, resources: List[Resource]) -> List[Resource]:
+    def getFromStorageSpace(self, resources: list[Resource]) -> list[Resource]:
         # Returns the list of requested resources
         return resources.copy()
 
-    def takeResources(self, resources: List[Resource]) -> None:
+    def takeResources(self, resources: list[Resource]) -> None:
         # Takes resources from the pool
         for res in resources:
             if res in self._resources:
                 self._resources.remove(res)
 
-    def putResources(self, resources: List[Resource]) -> None:
+    def putResources(self, resources: list[Resource]) -> None:
         # Puts resources into the pool
         self._resources.extend(resources)
 

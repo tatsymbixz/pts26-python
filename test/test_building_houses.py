@@ -1,6 +1,7 @@
 """Tests for BuildingHouses."""
 import json
 import unittest
+
 from power_grid.building_houses import BuildingHouses
 from power_grid.simple_types import PhaseStatus, RequestError
 from power_grid.steps import CheckAndBumpStep

@@ -7,8 +7,7 @@ from power_grid.simple_types import PowerPlant, PowerPlantNumber, RequestError, 
 
 def plant(number: int) -> PowerPlant:
     """A plant with the given number."""
-    return PowerPlant(number, Resource.COAL, 1, 1)
-
+    return PowerPlant(PowerPlantNumber(number), [Resource.COAL], 1, 1)
 
 def plants(*plant_numbers: int) -> list[PowerPlant]:
     """Plants with the given numbers."""
@@ -17,7 +16,7 @@ def plants(*plant_numbers: int) -> list[PowerPlant]:
 
 def numbers(cards: list[PowerPlant]) -> list[int]:
     """Numbers of the plants."""
-    return [c.number for c in cards]
+    return [c.number.number for c in cards]
 
 
 def reverse_shuffle(cards: list[PowerPlant]) -> None:
@@ -63,7 +62,7 @@ class TestPowerPlantMarket(unittest.TestCase):
     def test_taking_discounted_plant_removes_discount(self) -> None:
         """After that the new lowest plant has its full price."""
         market = make()
-        self.assertEqual(market.take_power_plant(ppn(3)).number, 3)
+        self.assertEqual(market.take_power_plant(ppn(3)).number.number, 3)
         self.assertFalse(market.is_first_power_plant_discounted)
         self.assertEqual(market.minimum_bid(ppn(4)), 4)
 
@@ -77,7 +76,7 @@ class TestPowerPlantMarket(unittest.TestCase):
     def test_take_refills_from_the_deck(self) -> None:
         """The new plant goes to the future market and the markets stay sorted."""
         market = make()
-        self.assertEqual(market.take_power_plant(ppn(5)).number, 5)
+        self.assertEqual(market.take_power_plant(ppn(5)).number.number, 5)
         self.assertEqual(numbers(market.current_market), [3, 4, 6, 7])
         self.assertEqual(numbers(market.future_market), [8, 9, 10, 11])
         self.assertEqual(numbers(market.deck_above_step3), [12])
@@ -87,14 +86,14 @@ class TestPowerPlantMarket(unittest.TestCase):
         with self.assertRaises(ValueError):
             make().take_power_plant(ppn(7))
 
-    def test_unbought_discounted_plant_is_removed(self) -> None:
-        """At the end of the auction the lowest plant leaves the game."""
-        market = make()
-        market.remove_discounted_power_plant()
-        self.assertEqual(numbers(market.current_market), [4, 5, 6, 7])
-        self.assertEqual(numbers(market.future_market), [8, 9, 10, 11])
-        market.remove_discounted_power_plant()  # nothing more to remove
-        self.assertEqual(numbers(market.current_market), [4, 5, 6, 7])
+        def test_unbought_discounted_plant_is_removed(self) -> None:
+            """At the end of the auction the lowest plant leaves the game."""
+            market = make()
+            market.remove_discounted_power_plant()
+            self.assertEqual(numbers(market.current_market), [4, 5, 6, 7])
+            self.assertEqual(numbers(market.future_market), [8, 9, 10, 11])
+            market.remove_discounted_power_plant()  # nothing more to remove
+            self.assertEqual(numbers(market.current_market), [4, 5, 6, 7])
 
     def test_bought_discounted_plant_is_not_removed_again(self) -> None:
         """If the discounted plant was bought, nothing else is removed."""

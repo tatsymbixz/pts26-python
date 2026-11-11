@@ -1,21 +1,28 @@
 """Integration test: GameController + AuctionPowerPlants + PowerPlantMarket (first round)."""
 # pylint: disable=too-few-public-methods
 import unittest
-from typing import Sequence
+from collections.abc import Sequence
 from unittest.mock import MagicMock
 
 from power_grid.auction_power_plants import AuctionPowerPlants
 from power_grid.game_controller import GameController
 from power_grid.power_plant_market import PowerPlantMarket
-from power_grid.simple_types import (GamePhase, PlayerColor, PowerPlant, PowerPlantNumber,
-                                     RequestError, Resource)
+from power_grid.simple_types import (
+    GamePhase,
+    PlayerColor,
+    PowerPlant,
+    PowerPlantNumber,
+    RequestError,
+    Resource,
+)
 
 RED, BLUE, GREEN = PlayerColor.RED, PlayerColor.BLUE, PlayerColor.GREEN
 
 
 def plants(*numbers: int) -> list[PowerPlant]:
     """Plants with the given numbers."""
-    return [PowerPlant(n, Resource.COAL, 1, 1) for n in numbers]
+    return [PowerPlant(PowerPlantNumber(n), [Resource.COAL], 1, 1) for n in numbers]
+
 
 
 def ppn(number: int) -> PowerPlantNumber:
@@ -102,8 +109,8 @@ class TestFirstRoundAuction(unittest.TestCase):
         buying.start_phase.assert_called_once_with([BLUE, RED, GREEN])
         self.assertIsInstance(game.select_power_plant_to_bid(RED, ppn(6), 6), RequestError)
         # the market was refilled after every purchase
-        self.assertEqual([p.number for p in market.current_market], [6, 7, 8, 9])
-        self.assertEqual([p.number for p in market.future_market], [10, 11, 12])
+        self.assertEqual([p.number.number for p in market.current_market], [6, 7, 8, 9])
+        self.assertEqual([p.number.number for p in market.future_market], [10, 11, 12])
         # the third purchase drew the Step 3 card (the deck above it was empty)
         self.assertTrue(market.is_step3_start())
 

@@ -1,8 +1,7 @@
 import unittest
 
 from power_grid.player_power_plants import PlayerPowerPlants
-from power_grid.simple_types import (
-    PowerPlant, PowerPlantNumber, RequestError, Resource)
+from power_grid.simple_types import PowerPlant, PowerPlantNumber, RequestError, Resource
 
 
 def make_plant(number: int, resources: list[Resource], cities: int,

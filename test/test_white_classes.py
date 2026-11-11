@@ -1,15 +1,18 @@
 import unittest
+
 from power_grid.simple_types import (
-    PlayerColor,
-    Resource,
-    PhaseStatus,
     GamePhase,
     GameStep,
+    PhaseStatus,
+    PlayerColor,
     PowerPlant,
-    RequestError,
-    SerializedGameState,
     PowerPlantNumber,
+    RequestError,
+    Resource,
+    SerializedGameState,
 )
+
+
 class TestWhiteClasses(unittest.TestCase):
     """
     Unit tests for the white classes (Enums and Dataclasses).

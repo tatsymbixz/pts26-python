@@ -1,5 +1,5 @@
 """Towns: houses of the players in the towns."""
-from typing import Sequence, Union
+from collections.abc import Sequence
 
 from power_grid.connections import Connections
 from power_grid.simple_types import PlayerColor, RequestError
@@ -17,7 +17,7 @@ class Towns:
 
     def buy_houses(
         self, player: PlayerColor, town_names: Sequence[str], max_money: int
-    ) -> Union[int, RequestError]:
+    ) -> int | RequestError:
         """Builds a house in every town (in the given order) and returns the total price.
 
         Nothing is changed when any town is not allowed or the price is above `max_money`.
@@ -35,7 +35,7 @@ class Towns:
 
     def _calculate_price(
         self, player: PlayerColor, town_names: Sequence[str]
-    ) -> Union[int, RequestError]:
+    ) -> int | RequestError:
         """Checks every town in the given order and returns the total price.
 
         Does not change any state.

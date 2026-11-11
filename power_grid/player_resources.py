@@ -1,4 +1,4 @@
-from typing import Sequence
+from collections.abc import Sequence
 
 from power_grid.simple_types import Resource
 

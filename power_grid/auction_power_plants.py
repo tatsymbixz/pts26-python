@@ -1,16 +1,21 @@
 """AuctionPowerPlants: phase 2 (auction of power plants) of a round."""
 import json
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Mapping, Optional, Sequence, Union
 
 from power_grid.auction_interfaces import (
     InterfacePlayerBoardFacadeAuctionPowerPlants,
     InterfacePowerPlantMarketAuctionPowerPlants,
 )
 from power_grid.simple_types import (
-    PhaseStatus, PlayerColor, PowerPlantNumber, RequestError, Resource)
+    PhaseStatus,
+    PlayerColor,
+    PowerPlantNumber,
+    RequestError,
+    Resource,
+)
 
-Result = Union[PhaseStatus, RequestError]
+Result = PhaseStatus | RequestError
 
 
 @dataclass
@@ -44,9 +49,9 @@ class AuctionPowerPlants:  # pylint: disable=too-many-instance-attributes
         self._order: list[PlayerColor] = []
         self._running = False
         self._finished: set[PlayerColor] = set()  # bought a plant or do not want one
-        self._auction: Optional[_Auction] = None
-        self._pending_removal: Optional[PlayerColor] = None
-        self._last_bought: Optional[PowerPlantNumber] = None
+        self._auction: _Auction | None = None
+        self._pending_removal: PlayerColor | None = None
+        self._last_bought: PowerPlantNumber | None = None
 
     def start_phase(self, player_order: Sequence[PlayerColor]) -> None:
         """Starts the phase; players choose in the given order."""
@@ -57,7 +62,7 @@ class AuctionPowerPlants:  # pylint: disable=too-many-instance-attributes
         self._pending_removal = None
         self._last_bought = None
 
-    def current_player(self) -> Optional[PlayerColor]:
+    def current_player(self) -> PlayerColor | None:
         """Player who has to act now; None if the phase is not running."""
         if not self._running:
             return None
@@ -158,10 +163,10 @@ class AuctionPowerPlants:  # pylint: disable=too-many-instance-attributes
         })
 
     # ---------- internals ----------
-    def _chooser(self) -> Optional[PlayerColor]:
+    def _chooser(self) -> PlayerColor | None:
         return next((p for p in self._order if p not in self._finished), None)
 
-    def _check_choosing(self, player: PlayerColor) -> Optional[RequestError]:
+    def _check_choosing(self, player: PlayerColor) -> RequestError | None:
         if not self._running:
             return RequestError("The auction is not running")
         if self._pending_removal is not None:
@@ -172,7 +177,7 @@ class AuctionPowerPlants:  # pylint: disable=too-many-instance-attributes
             return RequestError("Not your turn")
         return None
 
-    def _check_bidding(self, player: PlayerColor) -> Optional[RequestError]:
+    def _check_bidding(self, player: PlayerColor) -> RequestError | None:
         if not self._running:
             return RequestError("The auction is not running")
         if self._auction is None:

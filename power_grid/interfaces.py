@@ -1,6 +1,8 @@
 # pylint: disable=unused-argument, duplicate-code
-from typing import Sequence, Protocol
-from power_grid.simple_types import Resource, PowerPlant, RequestError
+from collections.abc import Sequence
+from typing import Protocol
+
+from power_grid.simple_types import PowerPlant, RequestError, Resource
 
 
 class InterfaceResourcePoolResourceMarket(Protocol):

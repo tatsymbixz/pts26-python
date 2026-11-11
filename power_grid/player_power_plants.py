@@ -1,8 +1,8 @@
+from collections.abc import Hashable, Mapping, Sequence
 from itertools import combinations
-from typing import Hashable, Mapping, Optional, Sequence, TypeVar, Union
+from typing import TypeVar
 
-from power_grid.simple_types import (
-    PowerPlant, PowerPlantNumber, RequestError, Resource)
+from power_grid.simple_types import PowerPlant, PowerPlantNumber, RequestError, Resource
 
 MAX_POWER_PLANTS = 3
 STORAGE_FACTOR = 2  # a plant can store up to 2x the resources it needs per run
@@ -63,7 +63,7 @@ class PlayerPowerPlants:
             raise ValueError(f"Power plant {plant.number.number} is already owned")
         self._plants.append(plant)
 
-    def remove_power_plant(self, number: PowerPlantNumber) -> Optional[RequestError]:
+    def remove_power_plant(self, number: PowerPlantNumber) -> RequestError | None:
         """Removes the plant with the given number, or returns an error if not owned."""
         for plant in self._plants:
             if plant.number == number:
@@ -75,7 +75,7 @@ class PlayerPowerPlants:
         """Returns the power plants owned by the player."""
         return list(self._plants)
 
-    def best_power_plant(self) -> Optional[PowerPlantNumber]:
+    def best_power_plant(self) -> PowerPlantNumber | None:
         """Returns the highest plant number the player owns (None if no plants)."""
         if not self._plants:
             return None
@@ -110,7 +110,7 @@ class PlayerPowerPlants:
         return best
 
     def cities_powered_by(self, numbers: Sequence[PowerPlantNumber],
-                          resources: Sequence[Resource]) -> Union[int, RequestError]:
+                          resources: Sequence[Resource]) -> int | RequestError:
         """
         Returns how many cities the chosen plants power with the given resources.
 

@@ -1,5 +1,5 @@
-from power_grid.simple_types import SerializedGameState
 from power_grid.game_adapter import PowerGridGameAdapter
+from power_grid.simple_types import SerializedGameState
 
 
 def test_game_adapter_conversion() -> None:

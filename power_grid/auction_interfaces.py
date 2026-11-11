@@ -1,6 +1,7 @@
 """Interfaces that AuctionPowerPlants needs from the market and from the player boards."""
 # pylint: disable=unused-argument, duplicate-code
-from typing import Optional, Protocol, Sequence
+from collections.abc import Sequence
+from typing import Protocol
 
 from power_grid.simple_types import PowerPlant, PowerPlantNumber, RequestError, Resource
 
@@ -10,7 +11,7 @@ class InterfacePowerPlantMarketAuctionPowerPlants(Protocol):
 
     def can_take_power_plant(
         self, ppn: PowerPlantNumber, price: int
-    ) -> Optional[RequestError]:
+    ) -> RequestError | None:
         """None if the plant is in the current market and `price` is an allowed bid."""
         ...
 
@@ -40,6 +41,6 @@ class InterfacePlayerBoardFacadeAuctionPowerPlants(Protocol):
 
     def remove_power_plant(
         self, ppn: PowerPlantNumber, removed_resources: Sequence[Resource]
-    ) -> Optional[RequestError]:
+    ) -> RequestError | None:
         """Scraps a plant (and possibly some resources)."""
         ...

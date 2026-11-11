@@ -1,5 +1,5 @@
-from power_grid.simple_types import Resource
 from power_grid.resource_pool import ResourcePool
+from power_grid.simple_types import Resource
 
 
 def test_resource_pool_can_take_and_put() -> None:

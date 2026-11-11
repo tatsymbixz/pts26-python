@@ -2,11 +2,17 @@
 # pylint: disable=too-few-public-methods, too-many-public-methods, attribute-defined-outside-init
 import json
 import unittest
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 from power_grid.auction_power_plants import AuctionPowerPlants
-from power_grid.simple_types import (PhaseStatus, PlayerColor, PowerPlant, PowerPlantNumber,
-                                     RequestError, Resource)
+from power_grid.simple_types import (
+    PhaseStatus,
+    PlayerColor,
+    PowerPlant,
+    PowerPlantNumber,
+    RequestError,
+    Resource,
+)
 
 A, B, C = PlayerColor.RED, PlayerColor.BLUE, PlayerColor.GREEN
 CONTINUES, ENDS = PhaseStatus.CONTINUES, PhaseStatus.PHASE_ENDS
@@ -25,7 +31,7 @@ class FakeMarket:
         self.taken: list[int] = []
         self.discount_removals = 0
 
-    def can_take_power_plant(self, number: PowerPlantNumber, price: int) -> Optional[RequestError]:
+    def can_take_power_plant(self, number: PowerPlantNumber, price: int) -> RequestError | None:
         """Rejects unknown plants and too low bids."""
         if number.number not in self.min_prices:
             return RequestError("Not in market")
@@ -41,7 +47,7 @@ class FakeMarket:
         """Removes the plant from the market."""
         del self.min_prices[number.number]
         self.taken.append(number.number)
-        return PowerPlant(number.number, Resource.COAL, 1, 1)
+        return PowerPlant(number, [Resource.COAL], 1, 1)
 
     def remove_discounted_power_plant(self) -> None:
         """Only counts the calls."""
@@ -51,7 +57,7 @@ class FakeMarket:
 class FakeBoard:
     """Player board with money and a limit of power plants."""
 
-    def __init__(self, money: int, plants: Optional[list[int]] = None) -> None:
+    def __init__(self, money: int, plants: list[int] | None = None) -> None:
         self.money = money
         self.plants: list[int] = list(plants or [])
 
@@ -67,7 +73,7 @@ class FakeBoard:
 
     def remove_power_plant(
         self, number: PowerPlantNumber, removed_resources: Sequence[Resource] # pylint: disable=unused-argument
-    ) -> Optional[RequestError]:
+    ) -> RequestError | None:
         """Scraps an owned plant."""
         if number.number not in self.plants:
             return RequestError("You do not own it")
@@ -79,7 +85,7 @@ class TestAuctionPowerPlants(unittest.TestCase):
     """Choosing, bidding, passing, scrapping and the end of the phase."""
 
     def make(self, players: list[PlayerColor], first_round: bool = False, money: int = 100,
-             plants: Optional[dict[PlayerColor, list[int]]] = None) -> AuctionPowerPlants:
+             plants: dict[PlayerColor, list[int]] | None = None) -> AuctionPowerPlants:
         """A started auction; self.market and self.boards are available for checks."""
         self.market = FakeMarket({3: 3, 4: 4, 5: 5, 6: 6, 7: 1})
         self.boards = {p: FakeBoard(money, (plants or {}).get(p, [])) for p in players}

@@ -1,6 +1,5 @@
-from enum import Enum, auto
 from dataclasses import dataclass
-from typing import List
+from enum import Enum, auto
 
 
 class Resource(Enum):
@@ -67,6 +66,6 @@ class PowerPlant:
     Represents a power plant card according to the UML diagram.
     """
     number: PowerPlantNumber
-    acceptedResources: List[Resource]
+    acceptedResources: list[Resource]
     numberOfCities: int
     resourceAmount: int = 0

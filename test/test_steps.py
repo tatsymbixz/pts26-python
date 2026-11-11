@@ -1,5 +1,5 @@
 from power_grid.simple_types import PlayerColor
-from power_grid.steps import DeterminePlayerOrder, CheckAndBumpStep
+from power_grid.steps import CheckAndBumpStep, DeterminePlayerOrder
 
 
 def test_player_order() -> None:

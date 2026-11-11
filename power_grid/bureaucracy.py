@@ -1,13 +1,24 @@
 # pylint: disable=too-many-arguments, too-many-positional-arguments
 """Bureaucracy phase."""
 from collections import Counter
-from typing import Mapping, Sequence, Union
+from collections.abc import Mapping, Sequence
+
 from power_grid.phase_dependencies import (
-    PlayerBoardForPhases, PowerPlantMarketForPhases, ResourcePoolForPhases,
-    StepChecker, TownsForPhases, TurnOrder)
+    PlayerBoardForPhases,
+    PowerPlantMarketForPhases,
+    ResourcePoolForPhases,
+    StepChecker,
+    TownsForPhases,
+    TurnOrder,
+)
 from power_grid.simple_types import (
-    PhaseStatus, PlayerColor, PowerPlant, PowerPlantNumber, RequestError,
-    Resource)
+    PhaseStatus,
+    PlayerColor,
+    PowerPlant,
+    PowerPlantNumber,
+    RequestError,
+    Resource,
+)
 
 
 class Bureaucracy:
@@ -31,7 +42,7 @@ class Bureaucracy:
 
     def use_power_plants(
             self, player: PlayerColor, ppns: Sequence[PowerPlantNumber],
-            resources_to_burn: Sequence[Resource]) -> Union[PhaseStatus, RequestError]:
+            resources_to_burn: Sequence[Resource]) -> PhaseStatus | RequestError:
         """Runs the chosen plants, burns fuel and pays income."""
         error = self._turn.check_turn(player)
         if error is not None:
@@ -55,11 +66,11 @@ class Bureaucracy:
     @staticmethod
     def _chosen_plants(
             board: PlayerBoardForPhases, ppns: Sequence[PowerPlantNumber],
-            burn: Sequence[Resource]) -> Union[list[PowerPlant], RequestError]:
+            burn: Sequence[Resource]) -> list[PowerPlant] | RequestError:
         if len(set(ppns)) != len(ppns):
             return RequestError("Power plant listed twice")
-            
-        owned = {PowerPlantNumber(p.number): p for p in board.get_power_plants()}
+
+        owned = {p.number: p for p in board.get_power_plants()}
         plants: list[PowerPlant] = []
         
         for ppn in ppns:

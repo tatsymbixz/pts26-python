@@ -1,6 +1,6 @@
 """PowerPlantMarket: the current market, the future market and the draw deck."""
 import random
-from typing import Callable, Optional, Sequence
+from collections.abc import Callable, Sequence
 
 from power_grid.simple_types import PowerPlant, PowerPlantNumber, RequestError
 
@@ -10,7 +10,7 @@ STEP3_MARKET_SIZE = 6
 
 
 def _number(plant: PowerPlant) -> int:
-    return plant.number
+    return plant.number.number
 
 
 class PowerPlantMarket:  # pylint: disable=too-many-instance-attributes
@@ -76,9 +76,9 @@ class PowerPlantMarket:  # pylint: disable=too-many-instance-attributes
             raise ValueError(f"Power plant {ppn.number} is not in the current market")
         if self.is_first_power_plant_discounted and plant.number == self._current[0].number:
             return 1
-        return plant.number
+        return plant.number.number
 
-    def can_take_power_plant(self, ppn: PowerPlantNumber, price: int) -> Optional[RequestError]:
+    def can_take_power_plant(self, ppn: PowerPlantNumber, price: int) -> RequestError | None:
         """None if the plant may be bought for `price`."""
         if self._find_current(ppn) is None:
             return RequestError(f"Power plant {ppn.number} is not in the current market")
@@ -109,7 +109,7 @@ class PowerPlantMarket:  # pylint: disable=too-many-instance-attributes
     # ---------- between phases and rounds ----------
     def remove_power_plants_cheaper_than(self, value: int) -> None:
         """Removes every plant of the current market with a number below `value`."""
-        while self._current and self._current[0].number < value:
+        while self._current and self._current[0].number.number < value:
             self._current.pop(0)
             self._rebalance(self._draw())
 
@@ -138,10 +138,9 @@ class PowerPlantMarket:  # pylint: disable=too-many-instance-attributes
         self._future = []
 
     # ---------- internals ----------
-    def _find_current(self, ppn: PowerPlantNumber) -> Optional[PowerPlant]:
-        return next((p for p in self._current if p.number == ppn.number), None)
-
-    def _draw(self) -> Optional[PowerPlant]:
+    def _find_current(self, ppn: PowerPlantNumber) -> PowerPlant | None:
+        return next((p for p in self._current if p.number == ppn), None)
+    def _draw(self) -> PowerPlant | None:
         """Next plant of the deck; None if the Step 3 card or nothing is drawn."""
         if self._above:
             return self._above.pop(0)
@@ -153,7 +152,7 @@ class PowerPlantMarket:  # pylint: disable=too-many-instance-attributes
             return self._below.pop(0)
         return None
 
-    def _rebalance(self, extra: Optional[PowerPlant]) -> None:
+    def _rebalance(self, extra: PowerPlant | None) -> None:
         plants = self._current + self._future
         if extra is not None:
             plants.append(extra)
