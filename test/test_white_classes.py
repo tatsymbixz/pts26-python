@@ -22,7 +22,7 @@ class TestWhiteClasses(unittest.TestCase):
         """
         Test that all enums are properly defined and have the correct number of values.
         """
-        # PlayerColor now has 6 colors including PURPLE
+        # PlayerColor now has 6 colors (PURPLE was added back)
         self.assertEqual(len(PlayerColor), 6)
         self.assertEqual(len(Resource), 4)
         self.assertEqual(len(PhaseStatus), 3)
@@ -32,18 +32,18 @@ class TestWhiteClasses(unittest.TestCase):
 
     def test_power_plant_valid(self) -> None:
         """
-        Test creating a valid power plant using the new UML fields (snake_case).
+        Test creating a valid power plant using the camelCase fields.
         """
         plant = PowerPlant(
             number=PowerPlantNumber(13), 
-            accepted_resources=[Resource.COAL], 
-            number_of_cities=3, 
-            resource_amount=2
+            acceptedResources=[Resource.COAL], 
+            numberOfCities=3, 
+            resourceAmount=2
         )
         self.assertEqual(plant.number.number, 13)
-        self.assertEqual(plant.accepted_resources, [Resource.COAL])
-        self.assertEqual(plant.number_of_cities, 3)
-        self.assertEqual(plant.resource_amount, 2)
+        self.assertEqual(plant.acceptedResources, [Resource.COAL])
+        self.assertEqual(plant.numberOfCities, 3)
+        self.assertEqual(plant.resourceAmount, 2)
 
     def test_power_plant_ecological(self) -> None:
         """
@@ -51,13 +51,13 @@ class TestWhiteClasses(unittest.TestCase):
         """
         plant = PowerPlant(
             number=PowerPlantNumber(20), 
-            accepted_resources=[], 
-            number_of_cities=5, 
-            resource_amount=0
+            acceptedResources=[], 
+            numberOfCities=5, 
+            resourceAmount=0
         )
-        self.assertEqual(plant.accepted_resources, [])
-        self.assertEqual(plant.number_of_cities, 5)
-        self.assertEqual(plant.resource_amount, 0)
+        self.assertEqual(plant.acceptedResources, [])
+        self.assertEqual(plant.numberOfCities, 5)
+        self.assertEqual(plant.resourceAmount, 0)
 
     def test_dataclasses(self) -> None:
         """
