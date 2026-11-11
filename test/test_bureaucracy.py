@@ -1,14 +1,6 @@
 """Tests for Bureaucracy."""
 import unittest
 
-from power_grid.bureaucracy import Bureaucracy
-from power_grid.simple_types import (
-    PhaseStatus,
-    PowerPlantNumber,
-    RequestError,
-    Resource,
-)
-from power_grid.steps import CheckAndBumpStep
 from test.fakes_phases import (
     BLUE,
     COAL_PLANT,
@@ -19,6 +11,14 @@ from test.fakes_phases import (
     FakePool,
     FakeTowns,
 )
+from power_grid.bureaucracy import Bureaucracy
+from power_grid.simple_types import (
+    PhaseStatus,
+    PowerPlantNumber,
+    RequestError,
+    Resource,
+)
+from power_grid.steps import CheckAndBumpStep
 
 
 class BureaucracyTest(unittest.TestCase):

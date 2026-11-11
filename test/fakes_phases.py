@@ -1,3 +1,4 @@
+# pylint: disable=unused-argument
 """Fakes shared by the tests of BuyingResources, BuildingHouses, Bureaucracy."""
 from collections.abc import Sequence
 
