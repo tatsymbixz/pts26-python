@@ -86,14 +86,15 @@ class TestPowerPlantMarket(unittest.TestCase):
         with self.assertRaises(ValueError):
             make().take_power_plant(ppn(7))
 
-        def test_unbought_discounted_plant_is_removed(self) -> None:
-            """At the end of the auction the lowest plant leaves the game."""
-            market = make()
-            market.remove_discounted_power_plant()
-            self.assertEqual(numbers(market.current_market), [4, 5, 6, 7])
-            self.assertEqual(numbers(market.future_market), [8, 9, 10, 11])
-            market.remove_discounted_power_plant()  # nothing more to remove
-            self.assertEqual(numbers(market.current_market), [4, 5, 6, 7])
+    def test_unbought_discounted_plant_is_removed(self) -> None:
+        """At the end of the auction the lowest plant leaves the game."""
+        market = make()
+        market.remove_discounted_power_plant()
+        self.assertEqual(numbers(market.current_market), [4, 5, 6, 7])
+        self.assertEqual(numbers(market.future_market), [8, 9, 10, 11])
+        market.remove_discounted_power_plant()  # nothing more to remove
+        self.assertEqual(numbers(market.current_market), [4, 5, 6, 7])
+
 
     def test_bought_discounted_plant_is_not_removed_again(self) -> None:
         """If the discounted plant was bought, nothing else is removed."""
