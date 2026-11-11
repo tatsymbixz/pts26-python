@@ -66,8 +66,29 @@ class SerializedGameState:
 class PowerPlant:
     """
     Represents a power plant card according to the UML diagram.
+    Fields are in snake_case to satisfy pylint and Python conventions.
     """
     number: PowerPlantNumber
     accepted_resources: List[Resource]
     number_of_cities: int
     resource_amount: int = 0
+
+    # --- Backward compatibility properties ---
+    # These properties allow the rest of the codebase (written by other team members)
+    # to continue using the old camelCase field names without breaking.
+    # They redirect read access to the new snake_case fields.
+
+    @property
+    def acceptedResources(self) -> List[Resource]:
+        """Compatibility property for 'accepted_resources'."""
+        return self.accepted_resources
+
+    @property
+    def numberOfCities(self) -> int:
+        """Compatibility property for 'number_of_cities'."""
+        return self.number_of_cities
+
+    @property
+    def resourceAmount(self) -> int:
+        """Compatibility property for 'resource_amount'."""
+        return self.resource_amount
