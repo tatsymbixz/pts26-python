@@ -12,12 +12,11 @@ class Resource(Enum):
 
 
 class PlayerColor(Enum):
-    """The possible colors for players. Power Grid supports up to 6 players."""
+    """The possible colors for players according to the UML diagram."""
     RED = auto()
     BLUE = auto()
     GREEN = auto()
     YELLOW = auto()
-    PURPLE = auto()
     BLACK = auto()
 
 

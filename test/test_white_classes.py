@@ -22,7 +22,8 @@ class TestWhiteClasses(unittest.TestCase):
         """
         Test that all enums are properly defined and have the correct number of values.
         """
-        self.assertEqual(len(PlayerColor), 6)
+        # PlayerColor now has 5 colors according to UML (no PURPLE)
+        self.assertEqual(len(PlayerColor), 5)
         self.assertEqual(len(Resource), 4)
         self.assertEqual(len(PhaseStatus), 3)
         # GamePhase includes GAME_END, so it has 5 elements
