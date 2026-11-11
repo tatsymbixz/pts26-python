@@ -4,10 +4,18 @@ from power_grid.player_power_plants import PlayerPowerPlants
 from power_grid.simple_types import (
     PowerPlant, PowerPlantNumber, RequestError, Resource)
 
-COAL_PLANT = PowerPlant(number=4, resource=Resource.COAL, cities=1, required_resources=2)
-OIL_PLANT = PowerPlant(number=10, resource=Resource.OIL, cities=2, required_resources=1)
-ECO_PLANT = PowerPlant(number=13, resource=None, cities=1)
-URANIUM_PLANT = PowerPlant(number=20, resource=Resource.URANIUM, cities=3, required_resources=1)
+
+def make_plant(number: int, resources: list[Resource], cities: int,
+               amount: int = 0) -> PowerPlant:
+    return PowerPlant(number=PowerPlantNumber(number), acceptedResources=resources,
+                      numberOfCities=cities, resourceAmount=amount)
+
+
+COAL_PLANT = make_plant(4, [Resource.COAL], 1, 2)
+OIL_PLANT = make_plant(10, [Resource.OIL], 2, 1)
+ECO_PLANT = make_plant(13, [], 1)
+URANIUM_PLANT = make_plant(20, [Resource.URANIUM], 3, 1)
+HYBRID_PLANT = make_plant(5, [Resource.COAL, Resource.OIL], 1, 2)
 
 
 class TestPlayerPowerPlants(unittest.TestCase):
@@ -44,6 +52,17 @@ class TestPlayerPowerPlants(unittest.TestCase):
         self.assertFalse(plants.can_store_resources([Resource.COAL] * 5))
         self.assertFalse(plants.can_store_resources([Resource.OIL]))
 
+    def test_can_store_resources_hybrid_shares_storage(self) -> None:
+        plants = PlayerPowerPlants([HYBRID_PLANT])
+        self.assertTrue(plants.can_store_resources(
+            [Resource.COAL, Resource.COAL, Resource.OIL, Resource.OIL]))
+        self.assertFalse(plants.can_store_resources([Resource.COAL] * 3 + [Resource.OIL] * 2))
+
+    def test_can_store_resources_hybrid_plus_regular(self) -> None:
+        plants = PlayerPowerPlants([HYBRID_PLANT, COAL_PLANT])
+        self.assertTrue(plants.can_store_resources([Resource.COAL] * 6 + [Resource.OIL] * 2))
+        self.assertFalse(plants.can_store_resources([Resource.COAL] * 9))
+
     def test_number_of_connectable_cities(self) -> None:
         plants = PlayerPowerPlants([COAL_PLANT, OIL_PLANT, ECO_PLANT])
         self.assertEqual(plants.number_of_connectable_cities([]), 1)
@@ -51,6 +70,11 @@ class TestPlayerPowerPlants(unittest.TestCase):
         self.assertEqual(
             plants.number_of_connectable_cities(
                 [Resource.COAL, Resource.COAL, Resource.OIL]), 4)
+
+    def test_number_of_connectable_cities_hybrid(self) -> None:
+        plants = PlayerPowerPlants([HYBRID_PLANT, OIL_PLANT])
+        self.assertEqual(plants.number_of_connectable_cities([Resource.OIL] * 3), 3)
+        self.assertEqual(plants.number_of_connectable_cities([Resource.COAL] * 2), 1)
 
     def test_cities_powered_by(self) -> None:
         plants = PlayerPowerPlants([COAL_PLANT, OIL_PLANT])
