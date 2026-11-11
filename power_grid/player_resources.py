@@ -4,7 +4,7 @@ from power_grid.simple_types import Resource
 
 
 class PlayerResources:
-    """Stores the resources a player currently holds (implements StoreResources)."""
+    """Stores the resources a player currently holds."""
 
     def __init__(self, resources: Sequence[Resource] = ()) -> None:
         self._amounts: dict[Resource, int] = {resource: 0 for resource in Resource}
