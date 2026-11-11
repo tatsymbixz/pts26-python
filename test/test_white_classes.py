@@ -10,8 +10,6 @@ from power_grid.simple_types import (
     SerializedGameState,
     PowerPlantNumber,
 )
-
-
 class TestWhiteClasses(unittest.TestCase):
     """
     Unit tests for the white classes (Enums and Dataclasses).
@@ -29,7 +27,6 @@ class TestWhiteClasses(unittest.TestCase):
         # GamePhase includes GAME_END, so it has 5 elements
         self.assertEqual(len(GamePhase), 5)
         self.assertEqual(len(GameStep), 3)
-
     def test_power_plant_valid(self) -> None:
         """
         Test creating a valid power plant using the new UML fields.
