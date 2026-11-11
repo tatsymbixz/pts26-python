@@ -10,8 +10,8 @@ from power_grid.simple_types import (
 def _capacity(plants: Sequence[PowerPlant]) -> Counter[Resource]:
     capacity: Counter[Resource] = Counter()
     for plant in plants:
-        if plant.resource is not None:
-            capacity[plant.resource] += 2 * plant.required_resources
+        for res in plant.acceptedResources:
+            capacity[res] += plant.resourceAmount
     return capacity
 
 

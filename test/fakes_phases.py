@@ -5,9 +5,17 @@ from power_grid.simple_types import (
 
 RED = PlayerColor.RED
 BLUE = PlayerColor.BLUE
-COAL_PLANT = PowerPlant(number=5, resource=Resource.COAL, cities=2,
-                        required_resources=2)
-ECO_PLANT = PowerPlant(number=13, resource=None, cities=1)
+COAL_PLANT = PowerPlant(
+    number=5, 
+    acceptedResources=[Resource.COAL], 
+    numberOfCities=2, 
+    resourceAmount=2
+)
+ECO_PLANT = PowerPlant(
+    number=13, 
+    acceptedResources=[], 
+    numberOfCities=1
+)
 
 
 class FakeBoard:
