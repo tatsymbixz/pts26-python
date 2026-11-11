@@ -1,5 +1,7 @@
-from dataclasses import dataclass
+# pylint: disable=invalid-name
 from enum import Enum, auto
+from dataclasses import dataclass
+from typing import List
 
 
 class Resource(Enum):
@@ -16,6 +18,7 @@ class PlayerColor(Enum):
     BLUE = auto()
     GREEN = auto()
     YELLOW = auto()
+    PURPLE = auto()
     BLACK = auto()
 
 
@@ -64,8 +67,9 @@ class SerializedGameState:
 class PowerPlant:
     """
     Represents a power plant card according to the UML diagram.
+    We use camelCase here to maintain compatibility with the rest of the team's code.
     """
     number: PowerPlantNumber
-    acceptedResources: list[Resource]
+    acceptedResources: List[Resource]
     numberOfCities: int
     resourceAmount: int = 0

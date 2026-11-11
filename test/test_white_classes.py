@@ -1,15 +1,14 @@
 import unittest
-
 from power_grid.simple_types import (
+    PlayerColor,
+    Resource,
+    PhaseStatus,
     GamePhase,
     GameStep,
-    PhaseStatus,
-    PlayerColor,
     PowerPlant,
-    PowerPlantNumber,
     RequestError,
-    Resource,
     SerializedGameState,
+    PowerPlantNumber,
 )
 
 
@@ -23,16 +22,17 @@ class TestWhiteClasses(unittest.TestCase):
         """
         Test that all enums are properly defined and have the correct number of values.
         """
-        # PlayerColor now has 5 colors according to UML (no PURPLE)
-        self.assertEqual(len(PlayerColor), 5)
+        # PlayerColor now has 6 colors (PURPLE was added back)
+        self.assertEqual(len(PlayerColor), 6)
         self.assertEqual(len(Resource), 4)
         self.assertEqual(len(PhaseStatus), 3)
         # GamePhase includes GAME_END, so it has 5 elements
         self.assertEqual(len(GamePhase), 5)
         self.assertEqual(len(GameStep), 3)
+
     def test_power_plant_valid(self) -> None:
         """
-        Test creating a valid power plant using the new UML fields.
+        Test creating a valid power plant using the camelCase fields.
         """
         plant = PowerPlant(
             number=PowerPlantNumber(13), 
