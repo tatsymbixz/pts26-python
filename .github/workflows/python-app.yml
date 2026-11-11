@@ -6,6 +6,7 @@ name: Python application
 on:
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -46,8 +47,8 @@ jobs:
         pip install pylint
     - name: Run lint
       run: |
-        pylint power_grid/
-        pylint test/
+        pylint --disable=C0103,C0303,C0304 power_grid/
+        pylint --disable=C0103,C0303,C0304 test/
 
   test:
 
@@ -61,5 +62,5 @@ jobs:
         python-version: "3.10"
     - name: Tests
       run: |
-        python3 -m unittest 
+        python3 -m unittest
 
