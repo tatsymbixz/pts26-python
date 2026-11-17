@@ -4,7 +4,7 @@ from typing import Optional
 from power_grid.simple_types import PowerPlant
 
 
-class PowerPlantMarket:
+class PowerPlantMarket:  # pylint: disable=too-many-instance-attributes
     """Manages the power plant market (current market, future market, and decks)."""
 
     def __init__(self, *args, **kwargs) -> None:
@@ -28,6 +28,7 @@ class PowerPlantMarket:
 
         self.is_step3: bool = False
         self.is_first_power_plant_discounted: bool = False
+        self.step3_started: int = 0  # <--- Инициализируем прямо здесь для pylint
 
         mid = len(self._deck) // 2 if self._deck else 0
         self.deck_above_step3 = list(self._deck[:mid])
@@ -81,8 +82,7 @@ class PowerPlantMarket:
         """Starts the third stage of the game: merges markets and removes the cheapest plant."""
         self.is_step3 = True
         
-        # Добавляем счётчик для тестов, проверяющих вызов start_step3
-        self.step3_started = getattr(self, "step3_started", 0) + 1
+        self.step3_started += 1
 
         combined = sorted(self._current_market + self._future_market, key=self._get_plant_num)
         if combined:

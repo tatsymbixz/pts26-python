@@ -38,12 +38,16 @@ class CheckAndBumpStep:
             return True
         return False
 
-    def checkAndBumpToStep3(self, step3_card_drawn: bool | int = False, max_cities: int | None = None, **kwargs: Any) -> bool:
+    def checkAndBumpToStep3(
+        self,
+        step3_card_drawn: bool | int = False,
+        max_cities: int | None = None,
+        **kwargs: Any,
+    ) -> bool:
         # Support legacy keyword argument 'max_cities' from older test suites
         if max_cities is None and 'max_cities' in kwargs:
             max_cities = kwargs['max_cities']
 
-        # Determine condition based on parameter type
         if max_cities is not None:
             condition = max_cities >= 14
         elif isinstance(step3_card_drawn, int) and not isinstance(step3_card_drawn, bool):
@@ -51,7 +55,6 @@ class CheckAndBumpStep:
         else:
             condition = bool(step3_card_drawn)
 
-        # Advance to Step 3 only if currently in Step 2 and condition is met
         if self.step == 2 and condition:
             self.step = 3
             return True
