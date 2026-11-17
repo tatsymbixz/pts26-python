@@ -1,5 +1,5 @@
 from collections.abc import Callable, Sequence
-from typing import Optional
+from typing import Any, Optional
 
 from power_grid.simple_types import PowerPlant
 
@@ -7,8 +7,10 @@ from power_grid.simple_types import PowerPlant
 class PowerPlantMarket:  # pylint: disable=too-many-instance-attributes
     """Manages the power plant market (current market, future market, and decks)."""
 
-    def __init__(self, *args, **kwargs) -> None:
-        shuffle_func: Optional[Callable] = kwargs.get("shuffle_func", None)
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        shuffle_func: Optional[
+            Callable[..., Sequence[PowerPlant]]
+        ] = kwargs.get("shuffle_func", None)
         deck_args = list(args)
 
         if len(deck_args) == 5 and callable(deck_args[-1]):
@@ -28,7 +30,7 @@ class PowerPlantMarket:  # pylint: disable=too-many-instance-attributes
 
         self.is_step3: bool = False
         self.is_first_power_plant_discounted: bool = False
-        self.step3_started: int = 0  # <--- Инициализируем прямо здесь для pylint
+        self.step3_started: int = 0
 
         mid = len(self._deck) // 2 if self._deck else 0
         self.deck_above_step3 = list(self._deck[:mid])
