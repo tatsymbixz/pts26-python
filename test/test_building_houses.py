@@ -9,7 +9,7 @@ from power_grid.steps import CheckAndBumpStep
 
 class BuildingHousesTest(unittest.TestCase):
     """BuildingHouses against fake towns and market and the real step checker."""
-
+    
     def setUp(self) -> None:
         self.red = FakeBoard()
         self.blue = FakeBoard()
@@ -52,11 +52,19 @@ class BuildingHousesTest(unittest.TestCase):
         self.assertEqual(self.towns.step2_started, 1)
         self.assertEqual(self.steps.getStep(), 2)
 
-    def test_step3_starts_market_step3(self) -> None:
+    def test_step3_card_starts_market_step3(self) -> None:
+        self.steps.startStep2()
+        self.market.step3_card_drawn = True
+        self.phase.build_houses(BLUE, ["Berlin"])
+        self.assertEqual(self.market.step3_started, 1)
+        self.assertEqual(self.steps.getStep(), 3)
+
+    def test_many_houses_without_step3_card_do_not_start_step3(self) -> None:
         self.steps.startStep2()
         self.towns.max = 14
         self.phase.build_houses(BLUE, ["Berlin"])
-        self.assertEqual(self.market.step3_started, 1)
+        self.assertEqual(self.market.step3_started, 0)
+        self.assertEqual(self.steps.getStep(), 2)
 
     def test_last_player_ends_phase(self) -> None:
         self.phase.build_houses(BLUE, [])

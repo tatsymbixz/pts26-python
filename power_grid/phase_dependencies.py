@@ -78,6 +78,10 @@ class PowerPlantMarketForPhases(Protocol):
         """Removes plants strictly below value."""
         ...
 
+    def is_step3_start(self) -> bool:
+        # True when the Step 3 card has been drawn.
+        ...
+
     def start_step3(self) -> None:
         ...
 
@@ -94,7 +98,7 @@ class StepChecker(Protocol):
     def checkAndBumpToStep2(self, max_cities: int) -> bool:
         ...
 
-    def checkAndBumpToStep3(self, max_cities: int) -> bool:
+    def checkAndBumpToStep3(self, step3_card_drawn: bool) -> bool:
         ...
 
 

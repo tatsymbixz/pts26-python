@@ -34,6 +34,7 @@ class FakeBoard:
         self.resources = list(resources)
         self.plants = list(plants)
         self.income_towns: list[int] = []
+        
 
     def outstanding_money(self) -> int:
         return self.money
@@ -98,17 +99,20 @@ class FakeTowns:
     def start_step2(self) -> None:
         self.step2_started += 1
 
-
 class FakeMarket:
     """Power plant market that counts calls."""
 
     def __init__(self) -> None:
         self.removed_below: list[int] = []
         self.step3_started = 0
+        self.step3_card_drawn = False
         self.prepared = 0
-
+        
     def remove_power_plants_cheaper_than(self, value: int) -> None:
         self.removed_below.append(value)
+
+    def is_step3_start(self) -> bool:
+        return self.step3_card_drawn
 
     def start_step3(self) -> None:
         self.step3_started += 1

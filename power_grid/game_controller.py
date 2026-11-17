@@ -1,4 +1,5 @@
 """GameController: switches the game phases and forwards player requests to them."""
+import json
 from collections.abc import Sequence
 
 from power_grid.phase_interfaces import (
@@ -101,6 +102,25 @@ class GameController: # pylint: disable=too-many-instance-attributes
         if (err := self._check_phase(GamePhase.BUREAUCRACY)) is not None:
             return err
         return self._handle(self._bureaucracy.use_power_plants(player, ppns, resources_to_burn))
+
+    # ---------- state ----------
+    def get_state(self) -> str:
+        # JSON with the game phase and the state of the current phase.
+        return json.dumps({
+            "game_phase": self.game_phase.name,
+            "game_over": self.game_over,
+            "is_first_turn": self.is_first_turn,
+            "phase_state": self._phase_state(),
+        })
+
+    def _phase_state(self) -> str:
+        if self.game_phase is GamePhase.AUCTION:
+            return self._auction.get_state()
+        if self.game_phase is GamePhase.BUY_RESOURCES:
+            return self._buying.get_state()
+        if self.game_phase is GamePhase.BUILD_HOUSES:
+            return self._building.get_state()
+        return self._bureaucracy.get_state()
 
     # ---------- internals ----------
     def _check_phase(self, expected: GamePhase) -> RequestError | None:
