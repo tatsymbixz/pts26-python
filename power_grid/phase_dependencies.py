@@ -78,6 +78,9 @@ class PowerPlantMarketForPhases(Protocol):
         """Removes plants strictly below value."""
         ...
 
+    def is_step3_start(self) -> bool:
+        ...
+
     def start_step3(self) -> None:
         ...
 
@@ -96,7 +99,6 @@ class StepChecker(Protocol):
 
     def checkAndBumpToStep3(self, step3_card_drawn: bool) -> bool:
         ...
-
 
 class TurnOrder:
     """Tracks whose turn it is inside a phase."""
