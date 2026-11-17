@@ -100,6 +100,7 @@ class StepChecker(Protocol):
     def checkAndBumpToStep3(self, step3_card_drawn: bool) -> bool:
         ...
 
+
 class TurnOrder:
     """Tracks whose turn it is inside a phase."""
 
